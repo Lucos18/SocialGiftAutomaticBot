@@ -9,9 +9,9 @@
 <h2 align="center">👋 Welcome to the future of automation</h2>
 <h3 align="center">A simple bot that uses selenium to automate simple actions on Social Gift bot written in Python.</h3>
 <h3 align="center">
-```
+
 - Use it at your own risk, The administrator of the bot may ban your account (and I would not be responsible for it) -
-```
+
 </h3>
 
 <h2 align="center">Installation</h2>
@@ -36,7 +36,7 @@
         "accountPassword": "Your Password"
     }
 </pre></li>
-	<li>Login to telegram on your chrome browser</li>
+	<li>Login to telegram on your chrome browser (You need to do it only once if you're not logged in before)</li>
 	<li>Change inside the python script "pythonbot.py" the arguments to the corresponding one of your computer</li>
     <li>Run the script</li>
    </ul>
