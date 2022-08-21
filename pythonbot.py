@@ -16,7 +16,7 @@ import warnings
 listLikeFollowStories = [{"Like" : 0, "Follow" : 0, "Stories" : 0}]
 
 #Default list of Settings that will be added to the file "Settings.json" when the file doesn't not exists.
-listSettings = {"like" : False, "follow" : False, "comments" : True, "stories" : False, "video" : False}
+listSettings = {"like" : False, "follow" : False, "comments" : True, "stories" : False, "video" : False, "directoryChromeSettings": "C:\\Users\\YourPCUsername\\AppData\\Local\\Google\\Chrome\\User Data"}
 
 #It will check if the file "dump.json" exists in the directory, if not it will create one after the login to the instagram account.
 #The dump file will contain all the information of the "device" used to login on instagram, so there is a less risk to get the account blocked.
@@ -39,7 +39,7 @@ def writeListInformation(listCounter):
 #If video campaign is found it will wait 10 minutes and then it will press "Conferma" button
 def watchVideoWait():
     print("video found, i will wait 600 seconds, if you want to disable this and skip it please configure the settings.json file.")
-    sleep (600)
+    sleep(600)
     driver.find_element_by_xpath(('//button[contains(text(),"CONFERMA")]')).click();
 
 #If follow campaign is found it will do the follow on instagram by getting the username and using different api request.
@@ -83,7 +83,7 @@ def controllo_campagna():
             return True
 
 #If Like campaign is found it will do the Like action on instagram by getting the link and using different api request.
-def metti_like():
+def actionLike():
     try:
         global likeCounter 
         #It will get the link to the instagram profile inside the telegram message
@@ -112,15 +112,15 @@ def metti_like():
         sleep(3)
 
 #If comment campaign is found, at the moment it will only skip it
-def salta_commento():
+def skipComments():
     print('I will skip the comments.')
     driver.find_element_by_xpath(('//button[contains(text(),"SALTA")]')).click();
     sleep(3)
 
 #If story campaign is found, it will wait 30 seconds before continuing.
-def conferma_stories():
+def confirmStories():
     global storiesCounter
-    print('I will wait 30 seconds before pressing "Conferma".')
+    print('Story found, I will wait 30 seconds before pressing "Conferma".')
     sleep(30)
     driver.find_element_by_xpath(('//button[contains(text(),"CONFERMA")]')).click();
     storiesCounter = storiesCounter + 1
@@ -186,7 +186,8 @@ cl = Client()
 checkDumpFile()
 print("Login successfull!")
 chrome_options = Options()
-chrome_options.add_argument("user-data-dir=C:\\Users\Lucos18\\AppData\\Local\\Google\\Chrome\\User Data")
+chrome_options.add_argument('user-data-dir=' + listSettings["directoryChromeSettings"])
+chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(options=chrome_options)
 driver.implicitly_wait(5)
 #Get the list of Counter from "counter.json" file that stores counters of past sessions.
@@ -204,7 +205,7 @@ driver.get("https://web.telegram.org/k/#@socialgiftbot")
 while not (finishedCampaigns):
     likeNotFound = listSettings["like"]
     followNotFound = listSettings["follow"] 
-    commentoNotFound = listSettings["comments"] 
+    commentNotFound = listSettings["comments"] 
     storiesNotFound = listSettings["stories"] 
     videoNotFound = listSettings["video"]
     campaignNotFound = False
@@ -214,10 +215,9 @@ while not (finishedCampaigns):
         sleep(3)
     try:
         while not (likeNotFound):
-            print(likeNotFound)
             sleep(3)
             driver.find_element(By.XPATH, '//div[@class="message"]//img[@alt="❤️"]')
-            metti_like()
+            actionLike()
             listCounter = [{"Like" : likeCounter, "Follow" : followCounter, "Stories" : storiesCounter}]
             writeListInformation(listCounter)
             sleep(3)
@@ -225,17 +225,17 @@ while not (finishedCampaigns):
         print("Like not found, i will continue.")
         likeNotFound = True
     try:
-        #implementare una funzione per il commento
-        while not (commentoNotFound):
+        #will added later on
+        while not (commentNotFound):
             driver.find_element(By.XPATH, '//div[@class="message"]//img[@alt="💬"]')
-            salta_commento()
+            skipComments()
     except:
         print("Comment not implemented, i will skip it.")
-        commentoNotFound = True
+        commentNotFound = True
     try:
         while not (storiesNotFound):
             driver.find_element(By.XPATH, '//div[@class="message"]//img[@alt="👁️"]')
-            conferma_stories()
+            confirmStories()
             listCounter = [{"Like" : likeCounter, "Follow" : followCounter, "Stories" : storiesCounter}]
             writeListInformation(listCounter)
     except:
@@ -243,9 +243,8 @@ while not (finishedCampaigns):
         storiesNotFound = True
     try:
         while not (videoNotFound):
-            #NOT IMPLEMENTED YET
-            #driver.find_element(By.XPATH, '//div[@class="message"]//img[@alt="💎"]')
-            #driver.find_element_by_xpath(('//div[contains(text(),"video")]'));
+            #mmmm videos
+            driver.find_element(By.XPATH, '//strong[normalize-space()="Per Intero"]')
             watchVideoWait()
     except:
         print("Video not found, i will continue.")
